@@ -1,0 +1,32 @@
+project:
+  type: website
+
+website:
+  title: "岩崎研究室"
+  navbar:
+    left:
+      - href: index.qmd
+        text: Home
+      - href: about.qmd
+        text: About
+      - href: members.qmd
+        text: Members
+      - href: research.qmd
+        text: Research
+      - href: publications.qmd
+        text: Publications
+      - href: news.qmd
+        text: News
+      - href: access.qmd
+        text: Access
+    right:
+    - icon: envelope
+      href: mailto:iwasaki@hannan-u.ac.jp
+
+format:
+  html:
+   theme: cosmo
+   toc: true
+   toc-title: "目次"
+   
+lang: ja

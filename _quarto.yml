@@ -2,7 +2,7 @@ project:
   type: website
 
 website:
-  title: "岩崎研究室"
+  title: "Iwasaki Laboratory"
   navbar:
     left:
       - href: index.qmd
@@ -19,9 +19,6 @@ website:
         text: News
       - href: access.qmd
         text: Access
-    right:
-    - icon: envelope
-      href: mailto:iwasaki@hannan-u.ac.jp
 
 format:
   html:

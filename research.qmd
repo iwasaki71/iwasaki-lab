@@ -2,14 +2,25 @@
 title: "Research"
 ---
 
-## 研究内容
+# 研究内容 (Research)
 
-岩崎研究室では，バイオメカニクス（生体力学）の観点から，人間の運動や身体機能に関する研究を行っています。
+岩崎研究室では，バイオメカニクス（生体力学）の観点から，ヒトの身体動作（特にスポーツ）や用具との相互作用に関する研究を行っています．
 
-### 研究テーマ（例）
+The Laboratory conducts research on sports-related human movement and humnan-equipment interactions from a biomechnical perspective.
 
-- テーマ1：準備中
-- テーマ2：準備中
-- テーマ3：準備中
+## 研究テーマ (Research theme)
+研究室では，主にフットウェア，スポーツパフォーマンス向上をテーマに研究を行っています．<br>
+We mainly conduct research on footwear and improvement for performance.
 
-具体的な研究テーマの詳細は今後追記していきます。
+### 1: フットウェア（Footwear)
+フットウェアの構造的差異とパフォーマンスや障害関連リスクの関係を調査しています．<br>
+Relationships between footwear characteristics and sports performance/injury risks.
+
+### 2: スポーツパフォーマンス向上 (Enhancing performance in Sports)
+スプリントを中心にパフォーマンス向上のための動力学要因の解明や，統計モデリングによる評価指標の作成を行っています．<br>
+Research on biomechanics about sprinting and statistical modelling.
+
+
+# 研究費 (Research grant)
+2025-2028　科研費　若手研究　「慢性ランニング障害のリスクを低減させるフットウェア構造の解明」<br>
+2022-2024　福岡大学　若手・女性研究基盤構築事業　「ハードル走で使用されるハードルバー素材の力学的特性の差異が競技者に与える影響」

@@ -2,18 +2,238 @@
 title: "Publications"
 ---
 
-## 論文・業績
+<!--
+  ============================================================
+  業績データはこの下の PAPERS / PRESENTATIONS / MISC を直接編集してください。
+  researchmap等のAPIには依存しません（手打ち管理）。
 
-準備中です。査読論文・学会発表・著書などを今後追記していきます。
+  【新しい業績を追加する場合】
+  該当リストの一番上に、以下のテンプレートをコピペして値を書き換えてください。
 
-### 査読論文
+  査読論文 (PAPERS) 用:
+    list(authors = c("著者1", "著者2"), year = "2026", title = "タイトル",
+         journal = "雑誌名", volume = "巻", pages = "開始-終了"),
 
-- 準備中
+  学会発表 (PRESENTATIONS) 用:
+    list(authors = c("著者1", "著者2"), year = "2026", title = "タイトル",
+         event = "学会名"),
 
-### 学会発表
+  著書・その他 (MISC) 用:
+    list(authors = c("著者1", "著者2"), year = "2026", title = "タイトル",
+         journal = "掲載誌名"),
 
-- 準備中
+  - authors は著者が1人なら "著者名" だけでもOK、複数なら c("A", "B", "C") のように書く
+  - volume / pages が無い場合は NULL のままでよい
+  - 自分の名前（岩崎領 / Ryo Iwasaki）は自動で太字＋下線になります
+  - 並び順（新しい年が上）は自動でソートされるので、追加順は気にしなくてよい
+  ============================================================
+-->
 
-### 著書・その他
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+invisible(Sys.setlocale("LC_CTYPE", "ja_JP.UTF-8"))
 
-- 準備中
+# ==== 表示設定：ここの値を変更すると表示形式を変えられます ====
+DISPLAY <- list(
+  bold_title      = TRUE,       # タイトルを太字にするか
+  show_journal    = TRUE,       # 雑誌名・発表先を表示するか
+  show_volume     = TRUE,       # 巻号を表示するか（査読論文のみ）
+  show_pages      = TRUE,       # ページ番号を表示するか（査読論文のみ）
+  year_format     = "&#xFF08;%s&#xFF09;",   # 年の表示形式（全角括弧）
+  segment_separator = "&#xFF0E;",           # 著者・年・タイトル・ジャーナルの間の区切り（全角ピリオド）
+  numbering       = TRUE,       # 上から1, 2, 3...と通し番号をつけるか
+  own_name_ja     = "岩崎領",   # 太字＋下線でハイライトする自分の名前（日本語, スペース有無どちらでも可）
+  own_name_en     = "Ryo Iwasaki", # 太字＋下線でハイライトする自分の名前（英語）
+  open_by_default = TRUE        # 最初からセクションを開いた状態にするか（FALSEで閉じた状態）
+)
+# ============================================================
+
+# ==== 査読論文 ====
+PAPERS <- list(
+  list(authors = c("Naoki Takahashi", "Ryo Iwasaki", "Hiroshi Kubota", "Hironari Shinkai"), year = "2026", title = "Characteristics of leg motion that related to bent knee violation in race walking", journal = "International Journal of Sports Science & Coaching", volume = NULL, pages = NULL),
+  list(authors = "Ryo Iwasaki", year = "2026", title = "Exploring models to optimise the prediction of interval times and step counts between hurdles in 400 m hurdles", journal = "International Journal of Sports Science & Coaching", volume = NULL, pages = NULL),
+  list(authors = c("山中亮", "髙橋恭平", "小林海", "大沼勇人", "岩崎領", "笠井信一", "後藤晴彦", "小泉潤", "貴嶋孝太", "松林武生"), year = "2026", title = "日本トップレベル400 m走者のレース前半区間における詳細な走速度の検討", journal = "Journal of Training Science for Exercise and Sports", volume = "37", pages = "201-209"),
+  list(authors = c("Ryo Iwasaki", "Sakie Nobuoka"), year = "2025", title = "CHANGES IN ARM AND LEG SWING DURING A 400 M SPRINT", journal = "The 43rd Proceedings of International Society of Biomechanics in Sports", volume = "43", pages = NULL),
+  list(authors = c("Kotaro Tsutsumi", "Tsuyoshi Iitake", "Yuji Tamura", "Ryo Iwasaki", "Hiroyuki Nunome"), year = "2025", title = "COMPARISON OF EXTERNAL INVERSION/EVERSION MOMENT BETWEEN BAREFOOT AND SHOD RUNNING", journal = "The 43rd Proceedings of International Society of Biomechanics in Sports", volume = "43", pages = NULL),
+  list(authors = c("Sho Ito", "Yuta Goto", "Ryo Iwasaki"), year = "2025", title = "Preliminary Investigation into the Biomechanics and EMG Analysis of Breaking Techniques in Wrestling set up", journal = "International Journal of Wrestling Science", volume = "15", pages = "28-41"),
+  list(authors = c("Ryo Iwasaki", "Tsuyoshi Iitake", "Hiroyuki Nunome"), year = "2025", title = "Effects of the arch support structure of slippers on gait", journal = "Footwear Science", volume = "17", pages = NULL),
+  list(authors = c("Kotaro Tsutsumi", "Tsuyoshi Iitake", "Yuji Tamura", "Ryo Iwasaki", "Hiroyuki Nunome"), year = "2024", title = "EFFECT OF CHANGING FOOT STRIKE PATTERN FROM REARFOOT TO FOREFOOT ON FOOT EXTERNAL EVERSION MOMENT", journal = "The 42nd Proceedings of International Society of Biomechanics in Sports", volume = "42", pages = NULL),
+  list(authors = c("Tsuyoshi Iitake", "Ryo Iwasaki", "Hiroyuki Nunome"), year = "2024", title = "SEX DIFFERENCES IN SUPPORT LEG DYNAMICS IN SOCCER INSTEP KICKING", journal = "The 42nd Proceedings of International Society of Biomechanics in Sports", volume = "42", pages = NULL),
+  list(authors = c("Naoki TAKAHASHI", "Ryo IWASAKI", "Hiroshi KUBOTA", "Hironari SHINKAI"), year = "2024", title = "国際競歩審判員におけるロス・オブ・コンタクト判定", journal = "Taiikugaku kenkyu (Japan Journal of Physical Education, Health and Sport Sciences)", volume = "69", pages = "89-96"),
+  list(authors = c("Ryo Iwasaki", "Naoki Takahashi", "Hironari Shinkai"), year = "2023", title = "Acute effects of sprint training for hamstrings injury prevention on male college soccer players", journal = "Scientific Journal of Sport and Performance", volume = "3", pages = "1-9"),
+  list(authors = c("髙橋直己", "岩崎領", "久保田浩史", "新海宏成"), year = "2023", title = "国内トップレベルの競歩審判員におけるベント・ニー判定のバイオメカニクス的検証", journal = "Journal of Training Science for Exercise and Sports", volume = "35", pages = "311-318"),
+  list(authors = c("Ryo Iwasaki", "Hiroyuki Nunome"), year = "2023", title = "THE PREDICTIVE MODEL OF INTERVAL TIME BASED ON PACING STRATEGY IN A 400 M HURDLES RACE", journal = "The 41st Proceedings of International Society of Biomechanics in Sports", volume = "41", pages = NULL),
+  list(authors = c("Ryo Iwasaki", "Hiroyuki Nunome", "Kento Nozawa"), year = "2022", title = "New predictive model of the touchdown times in a high level 110 m hurdles", journal = "PLOS ONE", volume = "17", pages = "e0278651-e0278651"),
+  list(authors = c("Ryo Iwasaki", "Hironari Shinkai", "Hiroyuki Nunome", "Nobuyuki Ito"), year = "2022", title = "Kinematic Factors Associated with Hitting Hurdles during the Initial Phase of a 110-m Hurdle Race", journal = "Journal of Human Kinetics", volume = "83", pages = "5-12"),
+  list(authors = c("岩崎領", "新海宏成", "伊藤信之"), year = "2020", title = "110mハードル走レース中におけるハードル接触の影響", journal = "Journal of Training Science for Exercise and Sports", volume = "32", pages = "141-147"),
+  list(authors = c("Ryo Iwasaki", "Hironari Shinkai", "Nobuyuki Ito"), year = "2020", title = "How hitting the hurdle affects performance in the 110m hurdles", journal = "The 38th Proceedings of International Society of Biomechanics in Sports", volume = "38", pages = NULL)
+)
+
+# ==== 学会発表 ====
+PRESENTATIONS <- list(
+  list(authors = "岩崎領", year = "2026", title = "フットウェアを対象としたバイオメカニクス研究における留意点", event = "日本バイオメカニクス学会70周年記念未来人材育成事業オンライン研究会第3回"),
+  list(authors = c("池永昌弘", "布目寛幸", "岩崎領", "田村雄志", "大熊伸江"), year = "2025", title = "テニスラケットのスイングウェイトがスイング動作とボール弾道に及ぼす影響", event = "第31回日本バイオメカニクス学会"),
+  list(authors = c("岩崎 領", "飯竹 烈士", "田村 雄志", "豊嶋 琉久", "新海 宏成"), year = "2025", title = "100m疾走中の上肢・下肢動作の変化と走速度低下との関係", event = "第31回日本バイオメカニクス学会"),
+  list(authors = c("Naoki Takahashi", "Hiroshi Kubota", "Ryo Iwasaki"), year = "2025", title = "DIFFERENCES IN BENT KNEE MOTIONS BETWEEN A YELLOW PADDLE AND A RED CARD IN RACE WALKING", event = "2025 International Conference on Movement Science and Technology"),
+  list(authors = c("Ryo Iwasaki", "Tsuyoshi Iitake", "Yuji Tamura"), year = "2025", title = "KINEMATIC CHANGES IN UPPER- AND LOWER-LIMBS MOVEMENTS IN 100-M SPRINT", event = "2025 International Conference on Movement Science and Technology"),
+  list(authors = c("Ryo Iwasaki", "Sakie Nobuoka"), year = "2025", title = "CHANGES IN ARM AND LEG SWING DURING A 400 M SPRINT", event = "The 43rd Proceedings of International Society of Biomechanics in Sports"),
+  list(authors = c("Kotaro Tsutsumi", "Tsuyoshi Iitake", "Yuji Tamura", "Ryo Iwasaki", "Hiroyuki Nunome"), year = "2025", title = "COMPARISON OF EXTERNAL INVERSION/EVERSION MOMENT BETWEEN BAREFOOT AND SHOD RUNNING", event = "The 43rd Proceedings of International Society of Biomechanics in Sports"),
+  list(authors = "Ryo Iwasaki", year = "2024", title = "Change in coordination of arm and leg swing during 400 m sprint", event = "3rd International Conference on Innovation & Technology in Sports & 10th Asian Society of Sports Biomechanics Conference"),
+  list(authors = c("Kotaro Tsutsumi", "Tsuyoshi Iitake", "Ryo Iwasaki", "Hiroyuki Nunome"), year = "2024", title = "Acute effect of the changes of foot strike pattern on foot external eversion moment", event = "3rd International Conference on Innovation & Technology in Sports & 10th Asian Society of Sports Biomechanics Conference"),
+  list(authors = c("豊嶋 琉久", "岩崎 領", "田村 雄志", "新海 宏成"), year = "2024", title = "100ｍ疾走中における上腕スイング動作の実態", event = "第30回日本バイオメカニクス学会大会"),
+  list(authors = "岩崎 領", year = "2024", title = "球技系アスリートに対するスプリントトレーニング", event = "第78回日本体力医学会"),
+  list(authors = c("Tsuyoshi Iitake", "Ryo Iwasaki", "Hiroyuki Nunome"), year = "2024", title = "SEX DIFFERENCES IN SUPPORT LEG DYNAMICS IN SOCCER INSTEP KICKING", event = "42nd International Society of Biomechanics in Sports conference"),
+  list(authors = c("Kotaro Tsutsumi", "Tsuyoshi Iitake", "Yuji Tamura", "Hiroyuki Nunome", "Ryo Iwasaki"), year = "2024", title = "EFFECT OF CHANGING FOOT STRIKE PATTERN FROM REARFOOT TO FOREFOOT ON FOOT EXTERNAL EVERSION MOMENT", event = "42nd International Society of Biomechanics in Sports conference"),
+  list(authors = c("Ryo Iwasaki", "Hiroyuki Nunome"), year = "2023", title = "THE PREDICTIVE MODEL OF INTERVAL TIME BASED ON PACING STRATEGY IN A 400 M HURDLES RACE", event = "41st International Society of Biomechanics in Sports conference"),
+  list(authors = c("池永昌弘", "岩崎領", "田村雄志", "布目寛幸"), year = "2022", title = "テニスラケット装着型完慣性センサによるスイング動作解析機器としての妥当性検証", event = "第28回日本バイオメカニクス学会大会"),
+  list(authors = c("Ryo Iwasaki", "Hiroyuki Nunome", "Shariman Ismadi Ismail"), year = "2021", title = "Differences in mechanical properties of hurdle bars", event = "XXVIII Congress of the International Society of Biomechanics"),
+  list(authors = c("岩崎領", "新海宏成", "伊藤信之"), year = "2019", title = "110mハードル走における接触の原因および影響に関するキネマティクス要因の検討", event = "第32回日本トレーニング科学会大会"),
+  list(authors = c("Ryo Iwasaki", "Hironari Shinkai", "Susumu Shigeta"), year = "2019", title = "The seven steps approach on 110m hurdles improve the performance after approach phase", event = "24th annual Congress of the European College of Sports Science"),
+  list(authors = c("Hironari Shinkai", "Ryo Iwasaki", "Koichiro Inoue", "Hiroyuki Nunome"), year = "2019", title = "Change in Soccer Players' Direct Shot Performance with A Rolling Ball at Different Velocities", event = "9th World Congress on Science and Football"),
+  list(authors = c("岩崎領", "高橋直己", "柴田遼太", "新海宏成"), year = "2018", title = "大学男子サッカー選手に対するスプリント指導の即時的効果", event = "日本フットボール学会16th Congress"),
+  list(authors = c("Ryo Iwasaki", "Hironari Shinkai", "Nobuyuki Ito"), year = "2018", title = "Cause and effect of hurdle hitting in 110 hurdle", event = "2018 KNSU International Conference - Asia-Pacific Conference on Coaching Science-"),
+  list(authors = c("岩崎領", "新海宏成"), year = "2018", title = "陸上競技110mハードル走における接触の影響", event = "第25回日本バイオメカニクス学会大会"),
+  list(authors = c("岩崎領", "成澤一希", "新海宏成"), year = "2018", title = "110mハードル走におけるアプローチ歩数減少トレーニングの効果", event = "東京体育学会第9回大会"),
+  list(authors = c("小出深冬", "成澤一希", "岩崎領", "新海宏成"), year = "2017", title = "女子ラグビーフットボールにおけるボールキャリアの走パフォーマンス", event = "日本フットボール学会15th Congress"),
+  list(authors = c("成島明仁", "成澤一希", "岩崎領", "新海宏成"), year = "2017", title = "ロングフィードの正確性の高いサッカー選手の技術的特徴", event = "日本フットボール学会15th Congress"),
+  list(authors = c("柴田遼太", "岩崎領", "新海宏成"), year = "2017", title = "アメリカンフットボールのレシーバーにおけるブレイクの動作分析", event = "日本フットボール学会15th Congress"),
+  list(authors = c("成澤一希", "岩崎領", "新海宏成"), year = "2017", title = "サッカートーキックのパフォーマンスを決定するボールインパクトの技術的要因", event = "日本フットボール学会15th Congress"),
+  list(authors = c("成澤一希", "岩崎領", "新海宏成"), year = "2017", title = "サッカーにおけるトーキックのインパクト解析", event = "日本体育学会第68回大会"),
+  list(authors = c("森山進一郎", "鈴木淳也", "岩崎領", "碓氷典諒", "吉田結花", "柴田義晴"), year = "2017", title = "牽引装置を用いたアシステッド泳が泳パフォーマンスに及ぼす影響", event = "日本体育学会第68回大会"),
+  list(authors = c("岩崎領", "成澤一希", "繁田進", "新海宏成"), year = "2017", title = "男子110mハードル走におけるアプローチ歩数現象トレーニングの短期的効果", event = "日本体育学会第68会大会"),
+  list(authors = c("Ryo Iwasaki", "Hironari Shinkai"), year = "2017", title = "Characteristics of hurdle contact pattern and its relation with race performance in 110m hurdles", event = "22nd annual Congress of the European College of Sports Science"),
+  list(authors = c("小宮山彦毅", "繁田進", "森山進一郎", "岩崎領", "碓氷典諒"), year = "2017", title = "クラウチングスタートの構えにおける手幅の違いが疾走パフォーマンスに及ぼす影響ー専門競技者と一般学生の比較からー", event = "日本コーチング学会第28回大会兼第10回日本体育学会体育方法専門領域研究会"),
+  list(authors = c("新海宏成", "井上功一郎", "岩崎領", "布目寛幸"), year = "2016", title = "サッカーにおけるクロスボールに対するボレーキックのパフォーマンス", event = "The First Japan-Korea Joint Congress on Science & Football and The 14th annual JSSF Congress"),
+  list(authors = c("成澤一希", "岩崎領", "新海宏成"), year = "2016", title = "サッカーにおけるトーキックの動作解析", event = "The First Japan-Korea Joint Congress on Science & Football and The 14th annual JSSF Congress"),
+  list(authors = c("成澤一希", "岩崎領", "新海宏成"), year = "2016", title = "サッカーにおけるトーキックの動作分析ーキックの種類における動作時間とフォームの比較ー", event = "第24回日本バイオメカニクス学会大会"),
+  list(authors = c("岩崎領", "成澤一希", "新海宏成"), year = "2016", title = "女子100mハードル走におけるスタート姿勢の変化がパフォーマンスに与える影響", event = "第24会日本バイオメカニクス学会大会"),
+  list(authors = c("岩崎領", "新海宏成"), year = "2016", title = "110mHにおけるセットポジション時の腰の高さが1台目クリアランスに及ぼす影響", event = "東京体育学会第7会大会")
+)
+
+# ==== 著書・その他 ====
+MISC <- list(
+  list(authors = c("大沼 勇人", "小林 海", "松林 武生", "髙橋 恭平", "山中 亮", "岩崎 領", "後藤晴彦", "小泉潤"), year = "2026", title = "2025年主要競技会における男女100mのレース分析", journal = "陸上競技研究紀要"),
+  list(authors = c("山中亮", "髙橋恭平", "小林海", "大沼勇人", "岩崎領", "後藤晴彦", "小泉潤", "松林武生"), year = "2026", title = "2025年度競技会における男女400m走のレース分析", journal = "陸上競技研究紀要"),
+  list(authors = c("貴嶋孝太", "柴山一仁", "杉本和那美", "森丘保典", "岩崎領", "前村公彦", "金子公宏"), year = "2020", title = "国内外一流女子100mハードルのレース分析-2019シーズンの主要競技会について-", journal = "陸上競技研究紀要"),
+  list(authors = c("柴山一仁", "貴嶋孝太", "杉本和那美", "森丘保典", "岩崎領", "櫻井健一", "苅部俊二", "金子公宏", "谷川聡"), year = "2020", title = "2019年シーズンにおける男子110mハードル走のレース分析", journal = "陸上競技研究紀要"),
+  list(authors = c("松林武生", "小山宏之", "苅山靖", "山本真帆", "吉本隆哉", "大沼勇人", "岩崎領"), year = "2020", title = "十種競技選手の走幅跳助走速度と100mレース最高走速度との関係-日本人選手と海外選手との比較-", journal = "陸上競技研究紀要"),
+  list(authors = c("柴山 一仁", "貴嶋 孝太", "杉本 和那美", "森丘 保典", "岩崎 領", "櫻井 健一", "苅部 俊二", "金子 公宏"), year = "2018", title = "2018年シーズンにおける男子110mハードル走のレース分析（日本陸連科学委員会研究報告 第17巻(2018) 陸上競技の医科学サポート研究 REPORT2018）", journal = "陸上競技研究紀要"),
+  list(authors = c("貴嶋 孝太", "柴山 一仁", "杉本 和那美", "森丘 保典", "岩崎 領", "前村 公彦", "金子 公宏"), year = "2018", title = "国内外一流女子100mハードルのレース分析：2018シーズンの主要競技会について（日本陸連科学委員会研究報告 第17巻(2018) 陸上競技の医科学サポート研究 REPORT2018）", journal = "陸上競技研究紀要"),
+  list(authors = c("松林 武生", "吉本 隆哉", "大沼 勇人", "山本 真帆", "丹治 史弥", "岩崎 領", "内山 成実"), year = "2018", title = "十種競技選手の走幅跳助走速度：100mレース最高走速度との比較（日本陸連科学委員会研究報告 第17巻(2018) 陸上競技の医科学サポート研究 REPORT2018）", journal = "陸上競技研究紀要"),
+  list(authors = c("松林 武生", "貴嶋 孝太", "吉本 隆哉", "大沼 勇人", "山本 真帆", "丹治 史弥", "岩崎 領", "内山 成実"), year = "2018", title = "十種競技選手の110mハードルレースの特徴：ハードル専門選手との比較（日本陸連科学委員会研究報告 第17巻(2018) 陸上競技の医科学サポート研究 REPORT2018）", journal = "陸上競技研究紀要")
+)
+
+# ============================================================
+# ここから下は表示ロジックです（通常は編集不要）
+# ============================================================
+
+escape_html <- function(x) {
+  if (is.null(x) || length(x) == 0 || (length(x) == 1 && is.na(x))) return("")
+  x <- gsub("&", "&amp;", x, fixed = TRUE)
+  x <- gsub("<", "&lt;", x, fixed = TRUE)
+  x <- gsub(">", "&gt;", x, fixed = TRUE)
+  x
+}
+
+is_own_name <- function(name) {
+  norm <- gsub("\\s+", "", name)
+  norm == gsub("\\s+", "", DISPLAY$own_name_ja) ||
+    tolower(norm) == tolower(gsub("\\s+", "", DISPLAY$own_name_en))
+}
+
+highlight_name <- function(name) {
+  esc <- escape_html(name)
+  if (is_own_name(name)) sprintf("<strong><u>%s</u></strong>", esc) else esc
+}
+
+authors_str <- function(authors) {
+  if (is.null(authors)) return("")
+  paste(sapply(authors, highlight_name), collapse = ", ")
+}
+
+build_parts <- function(title, auth, journal = NULL, vol = NULL, pages = NULL, year = "") {
+  # 表示順序: 著者名．（年）．タイトル．ジャーナル．
+  segments <- character(0)
+  if (nzchar(auth)) segments <- c(segments, auth)
+  if (DISPLAY$year_format != "" && nzchar(year)) segments <- c(segments, sprintf(DISPLAY$year_format, year))
+
+  title_html <- escape_html(title)
+  if (DISPLAY$bold_title) title_html <- sprintf("<strong>%s</strong>", title_html)
+  segments <- c(segments, title_html)
+
+  journal_bits <- character(0)
+  if (DISPLAY$show_journal && !is.null(journal)) journal_bits <- c(journal_bits, escape_html(journal))
+  if (DISPLAY$show_volume && !is.null(vol)) journal_bits <- c(journal_bits, sprintf("Vol.%s", escape_html(vol)))
+  if (DISPLAY$show_pages && !is.null(pages)) journal_bits <- c(journal_bits, escape_html(pages))
+  if (length(journal_bits) > 0) segments <- c(segments, paste(journal_bits, collapse = ", "))
+
+  paste0(paste(segments, collapse = DISPLAY$segment_separator), DISPLAY$segment_separator)
+}
+
+format_paper <- function(it) {
+  line <- build_parts(it$title, authors_str(it$authors), journal = it$journal, vol = it$volume, pages = it$pages, year = it$year)
+  sprintf("<li>%s</li>", line)
+}
+
+format_presentation <- function(it) {
+  line <- build_parts(it$title, authors_str(it$authors), journal = it$event, year = it$year)
+  sprintf("<li>%s</li>", line)
+}
+
+format_misc <- function(it) {
+  line <- build_parts(it$title, authors_str(it$authors), journal = it$journal, year = it$year)
+  sprintf("<li>%s</li>", line)
+}
+
+sort_by_year <- function(items) {
+  years <- sapply(items, function(it) if (is.null(it$year)) "0000" else it$year)
+  items[order(years, decreasing = TRUE)]
+}
+
+papers <- sort_by_year(PAPERS)
+presentations <- sort_by_year(PRESENTATIONS)
+misc_items <- sort_by_year(MISC)
+
+render_section <- function(id, title, items, formatter) {
+  body <- if (length(items) > 0) {
+    paste(sapply(items, formatter), collapse = "\n")
+  } else {
+    "<li>準備中です。</li>"
+  }
+  show_class <- if (DISPLAY$open_by_default) " show" else ""
+  expanded <- if (DISPLAY$open_by_default) "true" else "false"
+  collapsed_class <- if (DISPLAY$open_by_default) "" else " collapsed"
+  list_tag <- if (DISPLAY$numbering) "ol" else "ul"
+  sprintf(
+'<div class="accordion-item">
+<h2 class="accordion-header">
+<button class="accordion-button%s" type="button" data-bs-toggle="collapse" data-bs-target="#%s" aria-expanded="%s" aria-controls="%s">
+%s
+</button>
+</h2>
+<div id="%s" class="accordion-collapse collapse%s">
+<div class="accordion-body">
+<%s>
+%s
+</%s>
+</div>
+</div>
+</div>
+', collapsed_class, id, expanded, id, title, id, show_class, list_tag, body, list_tag)
+}
+```
+
+関連リンク：
+[researchmap](https://researchmap.jp/r_iwasaki) ／ [Google Scholar](https://scholar.google.co.jp/citations?user=SPpIP5oAAAAJ&hl=ja)
+
+```{r}
+#| echo: false
+#| results: asis
+cat('<div class="accordion" id="pubAccordion">')
+cat(render_section("collapse-papers", "査読論文", papers, format_paper))
+cat(render_section("collapse-presentations", "学会発表", presentations, format_presentation))
+cat(render_section("collapse-misc", "著書・その他", misc_items, format_misc))
+cat('</div>')
+```

@@ -2,12 +2,22 @@
 title: "About"
 ---
 
-## 研究室について
+## 研究室について (Laboratory)
 
-岩崎研究室（阪南大学総合情報学部）は，バイオメカニクス（生体力学）を中心に研究を行っています。
+岩崎研究室は，バイオメカニクス（生体力学）を中心に研究を行っています.<br>
+The Laboratory focuses on primarily on biomechanics.
 
-- 所属：阪南大学 総合情報学部
-- 研究室名：岩崎研究室（Laboratory of Biomechanics）
-- 担当教員：岩崎 領
+## 所属学会 (Memberships)
+- 日本バイオメカニクス学会<br>
+Japanese Society of Biomechanics<br>
+- 国際スポーツバイオメカニクス学会<br>
+International Society of Biomechanics in Sports<br>
+- 国際バイオメカニクス学会<br>
+International Society of Biomechanics<br>
+- フットウェアバイオメカニクスグループ<br>
+Footwear Biomechanics Group<br>
 
-準備中の項目です。研究室の理念・方針・沿革などを今後追記していきます。
+## 受賞 (Awards and Honours)
+- Best Poster Award<br>
+3rd International Conference on Innovation & Technology in Sports & 10th Asian Society of Sports Biomechanics Conference<br>
+

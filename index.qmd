@@ -1,6 +1,8 @@
 ---
 title: "阪南大学総合情報学部 岩崎研究室"
 ---
+Iwasaki Laboratory, Hannan University
+---
 
 ようこそ，阪南大学岩崎研究室ホームページへ！
 
@@ -8,12 +10,12 @@ Welcome to Laboratory of Biomechanics, Hannan University
 
 ## お知らせ
 
-- ホームページを開設しました。（[News](news.qmd) ページに随時更新予定）
+-   ホームページを開設しました。（[News](news.qmd) ページに随時更新予定）
 
 ## このサイトについて
 
-- [About](about.qmd): 研究室の概要
-- [Members](members.qmd): メンバー紹介
-- [Research](research.qmd): 研究内容
-- [Publications](publications.qmd): 業績一覧
-- [Access](access.qmd): アクセス・連絡先
+-   [About](about.qmd): 研究室の概要
+-   [Members](members.qmd): メンバー紹介
+-   [Research](research.qmd): 研究内容
+-   [Publications](publications.qmd): 業績一覧
+-   [Access](access.qmd): アクセス・連絡先

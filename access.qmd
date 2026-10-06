@@ -2,9 +2,15 @@
 title: "Access"
 ---
 
-## アクセス・連絡先
+## 所属（Affiliaction)
+- 阪南大学 (Hannan University, Japan)
+  - 総合情報学部 (Faculty of Information Sciences)
+  - 大学院企業情報研究科（Graduate School of Management & Information Technology）
 
-- 所属：阪南大学 総合情報学部 岩崎研究室
-- メール：[iwasaki@hannan-u.ac.jp](mailto:iwasaki@hannan-u.ac.jp)
+## 連絡先 (Contact)
+- メール (Mail)：iwasakiあhannan-u.ac.jp 
 
-キャンパスの住所・アクセスマップなどは今後追記していきます。
+ *あ を @ に置き換えてください (Please replace "あ" with @.)
+
+## アクセス (Access)
+<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3284.503002780222!2d135.5348878!3d34.5914401!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6000d94d4ee52019%3A0xd4799472eb667ec2!2z6Ziq5Y2X5aSn5a2m!5e0!3m2!1sja!2sjp!4v1786502595066!5m2!1sja!2sjp" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"></iframe>

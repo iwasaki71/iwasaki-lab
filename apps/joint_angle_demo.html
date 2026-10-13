@@ -163,7 +163,7 @@ const octx=overlay.getContext("2d"), pctx=plot.getContext("2d");
 const jointSel=$("joint");
 for(const [k,v] of Object.entries(JOINTS)){ const o=document.createElement("option"); o.value=k; o.textContent=v.label; jointSel.appendChild(o); }
 
-let landmarker=null, loadedModel=null, tsCursor=0;
+let landmarker=null, loadedModel=null, tsCursor=0, usedDelegate="";
 let frames=[];          // 各フレーム: Float32Array(33*3: x,y,vis) もしくは null
 let t0=0, fs=30, W=0, H=0;
 let series=[];          // {label,color,time[],raw[],filt[]}
@@ -195,8 +195,8 @@ async function ensureLandmarker(){
   const opts = d => ({ baseOptions:{modelAssetPath:MODEL_URL(m), delegate:d},
                        runningMode:"VIDEO", numPoses:1,
                        minPoseDetectionConfidence:0.5, minPosePresenceConfidence:0.5, minTrackingConfidence:0.5 });
-  try { landmarker = await PoseLandmarker.createFromOptions(fileset, opts("GPU")); }
-  catch(e){ landmarker = await PoseLandmarker.createFromOptions(fileset, opts("CPU")); }
+  try { landmarker = await PoseLandmarker.createFromOptions(fileset, opts("GPU")); usedDelegate="GPU"; }
+  catch(e){ console.warn("GPU delegate failed, fallback to CPU:", e); landmarker = await PoseLandmarker.createFromOptions(fileset, opts("CPU")); usedDelegate="CPU"; }
   loadedModel=m; tsCursor=0;
 }
 
@@ -223,6 +223,7 @@ $("run").addEventListener("click", async ()=>{
     frames=new Array(n).fill(null);
     const prog=$("prog"); prog.hidden=false; prog.max=n; prog.value=0;
     const base=tsCursor;
+    const tRun=performance.now();
     for(let i=0;i<n;i++){
       const t=t0+i/fs;
       await seek(t); await nextFrame();
@@ -237,7 +238,8 @@ $("run").addEventListener("click", async ()=>{
     }
     tsCursor = base + Math.round(n*1000/fs) + 1000;
     const ok=frames.filter(Boolean).length;
-    setStatus(`解析完了:${ok}/${n} フレームで姿勢を検出。`);
+    const msPer=(performance.now()-tRun)/n;
+    setStatus(`解析完了:${ok}/${n} フレームで姿勢を検出。(${usedDelegate}、1フレーム平均 ${msPer.toFixed(0)} ms)`);
     prog.hidden=true;
     rebuild(); video.currentTime=t0;
     $("csv").disabled=false;

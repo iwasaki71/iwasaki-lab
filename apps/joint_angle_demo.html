@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>関節角度波形デモ</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --ink:#1d2430; --sub:#5d6878; --line:#dfe3e9;
+    --accent:#1f6feb; --right:#d9480f; --left:#1c7ed6;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#14171c; --card:#1d2229; --ink:#e8ecf2; --sub:#9aa5b5; --line:#2e3640; --accent:#58a6ff; --right:#ff8a4c; --left:#5cb0ff; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;line-height:1.5}
+  header{padding:14px 20px;border-bottom:1px solid var(--line);background:var(--card)}
+  header h1{margin:0;font-size:18px}
+  header p{margin:2px 0 0;color:var(--sub);font-size:13px}
+  main{max-width:1200px;margin:0 auto;padding:16px;display:grid;gap:16px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  @media (max-width:860px){ main{grid-template-columns:1fr} }
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+  .card h2{margin:0 0 10px;font-size:14px;color:var(--sub);font-weight:600;letter-spacing:.02em}
+  .full{grid-column:1/-1}
+  .row{display:flex;flex-wrap:wrap;gap:12px;align-items:end}
+  label{display:flex;flex-direction:column;font-size:12px;color:var(--sub);gap:4px}
+  select,input[type=number],button{font:inherit;font-size:14px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
+  input[type=number]{width:84px}
+  button{cursor:pointer}
+  button.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:600}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .check{flex-direction:row;align-items:center;gap:6px;color:var(--ink);font-size:13px}
+  .stage{position:relative;background:#000;border-radius:8px;overflow:hidden}
+  .stage video{display:block;width:100%;max-height:62vh;object-fit:contain;background:#000}
+  .stage canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+  #plot{width:100%;height:340px;display:block;cursor:crosshair}
+  .status{font-size:13px;color:var(--sub);margin-top:8px;min-height:1.4em}
+  progress{width:100%;height:8px;margin-top:6px}
+  .readout{font-size:13px;margin-top:6px;display:flex;gap:16px;flex-wrap:wrap}
+  .readout b{font-variant-numeric:tabular-nums}
+  .note{font-size:12px;color:var(--sub);margin:8px 0 0}
+  .note li{margin:2px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>関節角度波形デモ(2D・キャリブレーションなし)</h1>
+  <p>スマホで撮影した動画 → MediaPipeで姿勢推定 → 選んだ関節の角度波形を表示</p>
+</header>
+
+<main>
+  <section class="card full">
+    <h2>1. 動画を選んで解析</h2>
+    <div class="row">
+      <label>動画ファイル
+        <input id="file" type="file" accept="video/*">
+      </label>
+      <label>モデル
+        <select id="model">
+          <option value="lite">lite(速い)</option>
+          <option value="full" selected>full(標準)</option>
+          <option value="heavy">heavy(高精度・遅い)</option>
+        </select>
+      </label>
+      <label>解析fps
+        <select id="fps">
+          <option>15</option><option selected>30</option><option>60</option><option>120</option>
+        </select>
+      </label>
+      <label>開始(s)<input id="tStart" type="number" step="0.1" min="0" value="0"></label>
+      <label>終了(s)<input id="tEnd" type="number" step="0.1" min="0" placeholder="最後まで"></label>
+      <button id="run" class="primary" disabled>解析開始</button>
+    </div>
+    <progress id="prog" value="0" max="1" hidden></progress>
+    <div id="status" class="status">動画を選択してください。</div>
+  </section>
+
+  <section class="card">
+    <h2>動画(骨格オーバーレイ)</h2>
+    <div class="stage">
+      <video id="video" controls playsinline muted></video>
+      <canvas id="overlay"></canvas>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <button id="prev">◀ 1コマ</button>
+      <button id="next">1コマ ▶</button>
+      <span id="frameInfo" class="status" style="margin:0"></span>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>2. 角度の設定と波形</h2>
+    <div class="row">
+      <label>関節・セグメント
+        <select id="joint"></select>
+      </label>
+      <label>左右
+        <select id="side">
+          <option value="R">右</option>
+          <option value="L">左</option>
+          <option value="B">両側</option>
+        </select>
+      </label>
+      <label>進行方向(画面上)
+        <select id="dir">
+          <option value="1">右向きに進む</option>
+          <option value="-1">左向きに進む</option>
+        </select>
+      </label>
+      <label>LPFカットオフ(Hz)
+        <input id="cutoff" type="number" min="0" max="30" step="1" value="8">
+      </label>
+      <label class="check"><input id="flex" type="checkbox"> 屈曲角で表示(180−内角)</label>
+    </div>
+    <canvas id="plot"></canvas>
+    <div id="readout" class="readout"></div>
+    <div class="row" style="margin-top:8px">
+      <button id="csv" disabled>CSV保存</button>
+      <span class="note" style="margin:0">波形をクリックするとその時刻へジャンプ</span>
+    </div>
+  </section>
+
+  <section class="card full">
+    <h2>撮影・解釈の注意(授業で触れると良い点)</h2>
+    <ul class="note">
+      <li>カメラは三脚で固定し、動作面(矢状面)に対して垂直・水平に設置。カメラ位置が斜めだと角度は過大/過小評価される。</li>
+      <li>これは<b>画像平面への投影角</b>であり、キャリブレーション・3D補正はしていない。絶対値より「波形の形・タイミング」を見るのが目的。</li>
+      <li>内角:関節を挟む2セグメントのなす角(伸展位≈180°)。セグメント角:鉛直下向き(体幹は鉛直上向き)からの傾きで、前方への傾きを正。</li>
+      <li>フレームごとの推定ノイズがあるため、ゼロ位相2次Butterworth LPF(filtfilt、実効4次)を適用。0Hzでフィルタなし。</li>
+      <li>画面内に複数人がいると別人を拾うことがある。被写体のみが映るように撮影する。</li>
+    </ul>
+  </section>
+</main>
+
+<script type="module">
+import { PoseLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/+esm";
+
+const WASM = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm";
+const MODEL_URL = m => `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_${m}/float16/1/pose_landmarker_${m}.task`;
+
+// ---- 定義 -------------------------------------------------------------
+const IDX = { // [右, 左]
+  shoulder:[12,11], elbow:[14,13], wrist:[16,15],
+  hip:[24,23], knee:[26,25], ankle:[28,27], heel:[30,29], toe:[32,31]
+};
+const JOINTS = {
+  knee:     { label:"膝関節(股−膝−足首)",       kind:"3", pts:["hip","knee","ankle"] },
+  hip:      { label:"股関節(肩−股−膝)",         kind:"3", pts:["shoulder","hip","knee"] },
+  ankle:    { label:"足関節(膝−足首−つま先)",   kind:"3", pts:["knee","ankle","toe"] },
+  elbow:    { label:"肘関節(肩−肘−手首)",       kind:"3", pts:["shoulder","elbow","wrist"] },
+  shoulder: { label:"肩関節(股−肩−肘)",         kind:"3", pts:["hip","shoulder","elbow"] },
+  thigh:    { label:"大腿セグメント角(鉛直基準)", kind:"seg", from:"hip", to:"knee", up:false },
+  shank:    { label:"下腿セグメント角(鉛直基準)", kind:"seg", from:"knee", to:"ankle", up:false },
+  trunk:    { label:"体幹前傾角(鉛直基準)",     kind:"seg", from:"hip", to:"shoulder", up:true }
+};
+const BONES = [[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],
+               [23,25],[25,27],[27,29],[29,31],[27,31],[24,26],[26,28],[28,30],[30,32],[28,32]];
+
+// ---- 要素 -------------------------------------------------------------
+const $ = id => document.getElementById(id);
+const video=$("video"), overlay=$("overlay"), plot=$("plot");
+const octx=overlay.getContext("2d"), pctx=plot.getContext("2d");
+const jointSel=$("joint");
+for(const [k,v] of Object.entries(JOINTS)){ const o=document.createElement("option"); o.value=k; o.textContent=v.label; jointSel.appendChild(o); }
+
+let landmarker=null, loadedModel=null, tsCursor=0;
+let frames=[];          // 各フレーム: Float32Array(33*3: x,y,vis) もしくは null
+let t0=0, fs=30, W=0, H=0;
+let series=[];          // {label,color,time[],raw[],filt[]}
+let lastDrawnT=-1;
+
+const setStatus = s => { $("status").textContent = s; };
+
+// ---- 動画読み込み -------------------------------------------------------
+$("file").addEventListener("change", e=>{
+  const f=e.target.files[0]; if(!f) return;
+  video.src = URL.createObjectURL(f);
+  frames=[]; series=[]; $("csv").disabled=true; redraw(true);
+  video.onloadedmetadata = ()=>{
+    W=video.videoWidth; H=video.videoHeight;
+    overlay.width=W; overlay.height=H;
+    $("tEnd").placeholder = video.duration.toFixed(1);
+    $("run").disabled=false;
+    setStatus(`読み込み完了:${W}×${H}px、${video.duration.toFixed(2)} s。「解析開始」を押してください。`);
+  };
+});
+
+// ---- 解析 -------------------------------------------------------------
+async function ensureLandmarker(){
+  const m=$("model").value;
+  if(landmarker && loadedModel===m) return;
+  if(landmarker){ landmarker.close(); landmarker=null; }
+  setStatus("モデルを読み込み中…(初回のみ数秒)");
+  const fileset = await FilesetResolver.forVisionTasks(WASM);
+  const opts = d => ({ baseOptions:{modelAssetPath:MODEL_URL(m), delegate:d},
+                       runningMode:"VIDEO", numPoses:1,
+                       minPoseDetectionConfidence:0.5, minPosePresenceConfidence:0.5, minTrackingConfidence:0.5 });
+  try { landmarker = await PoseLandmarker.createFromOptions(fileset, opts("GPU")); }
+  catch(e){ landmarker = await PoseLandmarker.createFromOptions(fileset, opts("CPU")); }
+  loadedModel=m; tsCursor=0;
+}
+
+function seek(t){
+  return new Promise(res=>{
+    if(Math.abs(video.currentTime-t)<1e-4){ res(); return; }
+    const h=()=>{ video.removeEventListener("seeked",h); res(); };
+    video.addEventListener("seeked",h);
+    video.currentTime=t;
+  });
+}
+const nextFrame = ()=>new Promise(r=>requestAnimationFrame(()=>r()));
+
+$("run").addEventListener("click", async ()=>{
+  const btn=$("run"); btn.disabled=true; video.pause();
+  try{
+    await ensureLandmarker();
+    fs=+$("fps").value;
+    const dur=video.duration;
+    t0=Math.max(0, +$("tStart").value||0);
+    const t1=Math.min(dur, +$("tEnd").value||dur);
+    const n=Math.floor((t1-t0)*fs)+1;
+    if(n<5){ setStatus("解析範囲が短すぎます。"); btn.disabled=false; return; }
+    frames=new Array(n).fill(null);
+    const prog=$("prog"); prog.hidden=false; prog.max=n; prog.value=0;
+    const base=tsCursor;
+    for(let i=0;i<n;i++){
+      const t=t0+i/fs;
+      await seek(t); await nextFrame();
+      const res=landmarker.detectForVideo(video, base+Math.round(i*1000/fs));
+      if(res.landmarks && res.landmarks[0]){
+        const a=new Float32Array(33*3);
+        res.landmarks[0].forEach((p,j)=>{ a[j*3]=p.x; a[j*3+1]=p.y; a[j*3+2]=p.visibility ?? 1; });
+        frames[i]=a;
+      }
+      prog.value=i+1;
+      if(i%5===0) setStatus(`解析中… ${i+1}/${n} フレーム`);
+    }
+    tsCursor = base + Math.round(n*1000/fs) + 1000;
+    const ok=frames.filter(Boolean).length;
+    setStatus(`解析完了:${ok}/${n} フレームで姿勢を検出。`);
+    prog.hidden=true;
+    rebuild(); video.currentTime=t0;
+    $("csv").disabled=false;
+  }catch(err){
+    console.error(err);
+    setStatus("エラー:"+(err.message||err)+"(ネット接続とモデル読み込みを確認)");
+  }
+  btn.disabled=false;
+});
+
+// ---- 角度計算 -----------------------------------------------------------
+function pt(a, name, side){ // ピクセル座標(アスペクト比を保つ)
+  const j=IDX[name][side==="R"?0:1];
+  return [a[j*3]*W, a[j*3+1]*H, a[j*3+2]];
+}
+function angleAt(a, def, side, dir, flex){
+  if(!a) return NaN;
+  if(def.kind==="3"){
+    const [p,q,r]=def.pts.map(n=>pt(a,n,side));
+    if(Math.min(p[2],q[2],r[2])<0.3) return NaN;
+    const v1=[p[0]-q[0],p[1]-q[1]], v2=[r[0]-q[0],r[1]-q[1]];
+    const c=(v1[0]*v2[0]+v1[1]*v2[1])/(Math.hypot(...v1)*Math.hypot(...v2));
+    const ang=Math.acos(Math.max(-1,Math.min(1,c)))*180/Math.PI;
+    return flex? 180-ang : ang;
+  } else {
+    const p=pt(a,def.from,side), q=pt(a,def.to,side);
+    if(Math.min(p[2],q[2])<0.3) return NaN;
+    const vx=q[0]-p[0], vy=q[1]-p[1];  // 画像座標:yは下向き正
+    return Math.atan2(dir*vx, def.up? -vy : vy)*180/Math.PI;
+  }
+}
+
+// ---- フィルタ(2次Butterworth LPF, filtfilt) ----------------------------------
+function butterLP(fc, fs){
+  const K=Math.tan(Math.PI*fc/fs), s2=Math.SQRT2, nrm=1/(1+s2*K+K*K);
+  const b0=K*K*nrm;
+  return { b:[b0,2*b0,b0], a:[2*(K*K-1)*nrm, (1-s2*K+K*K)*nrm] };
+}
+function filt1(x,{b,a}){
+  const y=new Array(x.length);
+  let x1=x[0],x2=x[0],y1=x[0],y2=x[0];
+  for(let i=0;i<x.length;i++){
+    const yi=b[0]*x[i]+b[1]*x1+b[2]*x2-a[0]*y1-a[1]*y2;
+    x2=x1;x1=x[i];y2=y1;y1=yi;y[i]=yi;
+  }
+  return y;
+}
+function filtfilt(x,fc,fs){
+  if(!(fc>0) || fc>=fs/2 || x.length<8) return x.slice();
+  const c=butterLP(fc,fs), pad=Math.min(x.length-1, Math.round(fs)); // 奇対称延長
+  const n=x.length, ext=new Array(n+2*pad);
+  for(let i=0;i<pad;i++){ ext[i]=2*x[0]-x[pad-i]; ext[n+pad+i]=2*x[n-1]-x[n-2-i]; }
+  for(let i=0;i<n;i++) ext[pad+i]=x[i];
+  let y=filt1(ext,c).reverse(); y=filt1(y,c).reverse();
+  return y.slice(pad,pad+n);
+}
+function fillGaps(x){ // 欠損を線形補間(端は最近傍)
+  const y=x.slice(), n=y.length; let first=y.findIndex(v=>!isNaN(v));
+  if(first<0) return null;
+  for(let i=0;i<first;i++) y[i]=y[first];
+  let last=first;
+  for(let i=first+1;i<n;i++){
+    if(!isNaN(y[i])){
+      for(let k=last+1;k<i;k++) y[k]=y[last]+(y[i]-y[last])*(k-last)/(i-last);
+      last=i;
+    }
+  }
+  for(let i=last+1;i<n;i++) y[i]=y[last];
+  return y;
+}
+
+function rebuild(){
+  series=[];
+  if(!frames.length){ redraw(true); return; }
+  const key=jointSel.value, def=JOINTS[key];
+  const sideSel=$("side").value, dir=+$("dir").value, flex=$("flex").checked;
+  const fc=+$("cutoff").value;
+  const sides = sideSel==="B"? ["R","L"] : [sideSel];
+  const time=frames.map((_,i)=>t0+i/fs);
+  for(const s of sides){
+    const raw=frames.map(a=>angleAt(a,def,s,dir,flex));
+    const filled=fillGaps(raw);
+    const filt= filled? filtfilt(filled,fc,fs) : raw.map(()=>NaN);
+    series.push({label:(s==="R"?"右 ":"左 ")+def.label.split("(")[0], side:s,
+                 color:s==="R"?"--right":"--left", time, raw, filt});
+  }
+  redraw(true);
+}
+["joint","side","dir","cutoff","flex"].forEach(id=>$(id).addEventListener("input",rebuild));
+
+// ---- 描画 -------------------------------------------------------------
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+function frameIndexAt(t){
+  if(!frames.length) return -1;
+  return Math.max(0, Math.min(frames.length-1, Math.round((t-t0)*fs)));
+}
+
+function drawOverlay(){
+  octx.clearRect(0,0,W,H);
+  const i=frameIndexAt(video.currentTime), a=i>=0?frames[i]:null;
+  if(!a) return;
+  const lw=Math.max(2,W/320);
+  octx.lineWidth=lw; octx.strokeStyle="rgba(255,255,255,.75)";
+  for(const [p,q] of BONES){
+    octx.beginPath(); octx.moveTo(a[p*3]*W,a[p*3+1]*H); octx.lineTo(a[q*3]*W,a[q*3+1]*H); octx.stroke();
+  }
+  octx.fillStyle="rgba(255,255,255,.9)";
+  for(let j=11;j<33;j++){ octx.beginPath(); octx.arc(a[j*3]*W,a[j*3+1]*H,lw*1.2,0,7); octx.fill(); }
+  // 選択関節を強調
+  const def=JOINTS[jointSel.value], sideSel=$("side").value;
+  const sides = sideSel==="B"? ["R","L"] : [sideSel];
+  for(const s of sides){
+    const names = def.kind==="3"? def.pts : [def.from,def.to];
+    const P = names.map(n=>pt(a,n,s));
+    octx.strokeStyle = css(s==="R"?"--right":"--left"); octx.lineWidth=lw*2.2;
+    octx.beginPath(); P.forEach((p,k)=> k? octx.lineTo(p[0],p[1]) : octx.moveTo(p[0],p[1])); octx.stroke();
+    octx.fillStyle=octx.strokeStyle;
+    P.forEach(p=>{ octx.beginPath(); octx.arc(p[0],p[1],lw*2.6,0,7); octx.fill(); });
+  }
+}
+
+function drawPlot(){
+  const dpr=window.devicePixelRatio||1;
+  const cw=plot.clientWidth, ch=plot.clientHeight;
+  if(plot.width!==cw*dpr||plot.height!==ch*dpr){ plot.width=cw*dpr; plot.height=ch*dpr; }
+  pctx.setTransform(dpr,0,0,dpr,0,0);
+  pctx.clearRect(0,0,cw,ch);
+  const ink=css("--ink"), sub=css("--sub"), line=css("--line");
+  const m={l:46,r:12,t:12,b:34}, pw=cw-m.l-m.r, ph=ch-m.t-m.b;
+  pctx.font="12px system-ui,sans-serif";
+  if(!series.length){
+    pctx.fillStyle=sub; pctx.textAlign="center";
+    pctx.fillText("解析後にここへ波形が表示されます",cw/2,ch/2); return;
+  }
+  const tmin=series[0].time[0], tmax=series[0].time[series[0].time.length-1];
+  let ymin=Infinity,ymax=-Infinity;
+  for(const s of series) for(const arr of [s.raw,s.filt]) for(const v of arr) if(!isNaN(v)){ ymin=Math.min(ymin,v); ymax=Math.max(ymax,v); }
+  if(!isFinite(ymin)){ ymin=0;ymax=1; }
+  const pad=(ymax-ymin)*0.08||1; ymin-=pad; ymax+=pad;
+  const X=t=>m.l+(t-tmin)/(tmax-tmin)*pw, Y=v=>m.t+(1-(v-ymin)/(ymax-ymin))*ph;
+  // 軸・グリッド
+  pctx.strokeStyle=line; pctx.fillStyle=sub; pctx.lineWidth=1;
+  const ystep=niceStep((ymax-ymin)/5);
+  pctx.textAlign="right";
+  for(let v=Math.ceil(ymin/ystep)*ystep; v<=ymax; v+=ystep){
+    const y=Y(v); pctx.beginPath(); pctx.moveTo(m.l,y); pctx.lineTo(m.l+pw,y); pctx.stroke();
+    pctx.fillText(v.toFixed(0)+"°",m.l-6,y+4);
+  }
+  const xstep=niceStep((tmax-tmin)/6);
+  pctx.textAlign="center";
+  for(let t=Math.ceil(tmin/xstep)*xstep; t<=tmax; t+=xstep){
+    const x=X(t); pctx.beginPath(); pctx.moveTo(x,m.t); pctx.lineTo(x,m.t+ph); pctx.stroke();
+    pctx.fillText(t.toFixed(2).replace(/\.?0+$/,"")+" s",x,ch-14);
+  }
+  // 系列
+  for(const s of series){
+    const col=css(s.color);
+    pctx.fillStyle=col; pctx.globalAlpha=.28;
+    s.raw.forEach((v,i)=>{ if(!isNaN(v)){ pctx.beginPath(); pctx.arc(X(s.time[i]),Y(v),1.8,0,7); pctx.fill(); } });
+    pctx.globalAlpha=1; pctx.strokeStyle=col; pctx.lineWidth=2; pctx.beginPath();
+    let started=false;
+    s.filt.forEach((v,i)=>{ if(isNaN(v)) return; const x=X(s.time[i]),y=Y(v); started? pctx.lineTo(x,y):(pctx.moveTo(x,y),started=true); });
+    pctx.stroke();
+  }
+  // カーソル
+  const tc=Math.min(Math.max(video.currentTime,tmin),tmax), xc=X(tc);
+  pctx.strokeStyle=ink; pctx.lineWidth=1.2; pctx.beginPath(); pctx.moveTo(xc,m.t); pctx.lineTo(xc,m.t+ph); pctx.stroke();
+  // 凡例
+  pctx.textAlign="left"; let lx=m.l+8;
+  for(const s of series){ pctx.fillStyle=css(s.color); pctx.fillRect(lx,m.t+6,14,3); pctx.fillStyle=ink; pctx.fillText(s.label,lx+18,m.t+12); lx+=pctx.measureText(s.label).width+40; }
+  plot._geom={m,pw,tmin,tmax};
+}
+function niceStep(raw){
+  const p=Math.pow(10,Math.floor(Math.log10(raw))), f=raw/p;
+  return (f<1.5?1:f<3.5?2:f<7.5?5:10)*p;
+}
+
+function updateReadout(){
+  const i=frameIndexAt(video.currentTime);
+  $("frameInfo").textContent = frames.length? `フレーム ${i+1}/${frames.length}  t=${video.currentTime.toFixed(3)} s` : "";
+  $("readout").innerHTML = series.map(s=>{
+    const v=i>=0? s.filt[i] : NaN;
+    return `<span style="color:${css(s.color)}">${s.label}:<b>${isNaN(v)?"—":v.toFixed(1)+"°"}</b></span>`;
+  }).join("");
+}
+
+function redraw(force){
+  const t=video.currentTime;
+  if(!force && t===lastDrawnT) return;
+  lastDrawnT=t; drawOverlay(); drawPlot(); updateReadout();
+}
+(function loop(){ redraw(false); requestAnimationFrame(loop); })();
+window.addEventListener("resize",()=>redraw(true));
+
+// ---- 操作 -------------------------------------------------------------
+plot.addEventListener("click",e=>{
+  const g=plot._geom; if(!g) return;
+  const x=e.clientX-plot.getBoundingClientRect().left;
+  const t=g.tmin+(x-g.m.l)/g.pw*(g.tmax-g.tmin);
+  video.currentTime=Math.min(Math.max(t,g.tmin),g.tmax);
+});
+$("prev").onclick=()=>{ video.pause(); video.currentTime=Math.max(0,video.currentTime-1/fs); };
+$("next").onclick=()=>{ video.pause(); video.currentTime=Math.min(video.duration,video.currentTime+1/fs); };
+
+$("csv").addEventListener("click",()=>{
+  if(!series.length) return;
+  const head=["time_s",...series.flatMap(s=>[s.side+"_raw_deg",s.side+"_filt_deg"])];
+  const rows=[head.join(",")];
+  series[0].time.forEach((t,i)=>{
+    rows.push([t.toFixed(4),...series.flatMap(s=>[isNaN(s.raw[i])?"":s.raw[i].toFixed(3), isNaN(s.filt[i])?"":s.filt[i].toFixed(3)])].join(","));
+  });
+  const blob=new Blob([rows.join("\n")],{type:"text/csv"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download=`angle_${jointSel.value}.csv`; a.click();
+});
+</script>
+</body>
+</html>

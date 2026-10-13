@@ -1,16 +1,12 @@
 ---
 title: "阪南大学総合情報学部 岩崎研究室"
 ---
-Iwasaki Laboratory, Hannan University
----
+
+## Iwasaki Laboratory, Hannan University
 
 ようこそ，阪南大学岩崎研究室ホームページへ！
 
 Welcome to Laboratory of Biomechanics, Hannan University
-
-## お知らせ
-
--   ホームページを開設しました。（[News](news.qmd) ページに随時更新予定）
 
 ## このサイトについて
 

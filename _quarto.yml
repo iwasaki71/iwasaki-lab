@@ -1,5 +1,7 @@
 project:
   type: website
+  resources:
+    - apps/
 
 website:
   title: "Iwasaki Laboratory"
@@ -15,6 +17,8 @@ website:
         text: Research
       - href: publications.qmd
         text: Publications
+      - href: experience.qmd
+        text: Experience
       - href: news.qmd
         text: News
       - href: access.qmd
